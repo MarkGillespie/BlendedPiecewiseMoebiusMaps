@@ -15,8 +15,10 @@
 #define EXPECT_VEC3_EQ(a, b) EXPECT_PRED2(Vector3Eq, a, b)
 #define EXPECT_VEC2_NEAR(a, b, tol) EXPECT_PRED3(Vector2Near, a, b, tol)
 #define EXPECT_VEC3_NEAR(a, b, tol) EXPECT_PRED3(Vector3Near, a, b, tol)
+#define EXPECT_CPLX_NEAR(a, b, tol) EXPECT_PRED3(CplxNear, a, b, tol)
 #define EXPECT_MAT_EQ(a, b) ExpectMatEq(a, b)
 #define EXPECT_MAT_NEAR(a, b, tol) ExpectMatEq(a, b, tol)
+#define EXPECT_MATC_NEAR(a, b, tol) ExpectMatCEq(a, b, tol)
 #define ASSERT_MAT_FINITE(m) AssertMatFinite(m)
 
 using namespace geometrycentral;
@@ -77,6 +79,31 @@ void ExpectMatEq(const Eigen::MatrixXd& a_, const Eigen::MatrixXd& b_,
                  threshold);
 }
 
+bool MatrixCEq(const EigenPrintWrap<Eigen::MatrixXcd>& lhs_,
+               const EigenPrintWrap<Eigen::MatrixXcd>& rhs_, double difference,
+               double threshold = -1) {
+    Eigen::MatrixXcd lhs = static_cast<Eigen::MatrixXcd>(lhs_);
+    Eigen::MatrixXcd rhs = static_cast<Eigen::MatrixXcd>(rhs_);
+    double err           = (lhs - rhs).norm();
+    if (threshold > 0) {
+        bool equal = abs(err) < threshold;
+        if (!equal) cerr << "norm of difference: " << err << endl;
+        return equal;
+    } else {
+        const ::testing::internal::FloatingPoint<double> difference(err),
+            zero(0);
+        bool equal = difference.AlmostEquals(zero);
+        if (!equal) cerr << "norm of difference: " << err << endl;
+        return equal;
+    }
+}
+
+void ExpectMatCEq(const Eigen::MatrixXcd& a_, const Eigen::MatrixXcd& b_,
+                  double threshold = -1) {
+    EXPECT_PRED4(MatrixCEq, print_wrap(a_), print_wrap(b_), (a_ - b_).norm(),
+                 threshold);
+}
+
 // Checks that matrix is finite and not nan
 bool MatFinite(const Eigen::MatrixXd& m) {
     return std::isfinite(m.squaredNorm());
@@ -108,6 +135,12 @@ bool Vector2Eq(const Vector2& a, const Vector2& b) {
 // Vector2 floating point near
 bool Vector2Near(const Vector2& a, const Vector2& b, const double& tol) {
     return (a - b).norm() < tol;
+}
+
+// std::complex<double> near
+bool CplxNear(const std::complex<double>& a, const std::complex<double>& b,
+              const double& tol) {
+    return norm(a - b) < tol;
 }
 
 // Vector3 floating point equality

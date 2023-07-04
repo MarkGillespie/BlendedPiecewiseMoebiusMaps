@@ -24,7 +24,7 @@ set_target_properties(gmock_main PROPERTIES FOLDER extern)
 # ADD YOUR LIBRARIES HERE
 macro(package_add_test TESTNAME)
     add_executable(${TESTNAME} ${ARGN})
-    target_link_libraries(${TESTNAME} gtest gmock gtest_main polyscope geometry-central)
+    target_link_libraries(${TESTNAME} gtest gmock gtest_main polyscope geometry-central BPM)
     target_include_directories(${TESTNAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../../include" "${CMAKE_CURRENT_SOURCE_DIR}/../" "${CMAKE_CURRENT_SOURCE_DIR}")
     add_test(NAME ${TESTNAME} COMMAND ${TESTNAME})
     set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)

@@ -1,14 +1,17 @@
+#include "geometrycentral/surface/boundary_first_flattening.h"
 #include "geometrycentral/surface/manifold_surface_mesh.h"
 #include "geometrycentral/surface/meshio.h"
-#include "geometrycentral/surface/simple_idt.h"
 #include "geometrycentral/surface/vertex_position_geometry.h"
 
+#include "polyscope/point_cloud.h"
 #include "polyscope/polyscope.h"
 #include "polyscope/surface_mesh.h"
 
 #include "args/args.hxx"
 #include "imgui.h"
 
+#include "BPM.h"
+#include "BPMShader.h"
 #include "utils.h"
 
 using namespace geometrycentral;
@@ -29,7 +32,7 @@ void myCallback() {}
 int main(int argc, char** argv) {
 
     // Configure the argument parser
-    args::ArgumentParser parser("Geometry program");
+    args::ArgumentParser parser("Blended Mobius Shader");
     args::Positional<std::string> inputFilename(parser, "mesh",
                                                 "Mesh to be processed.");
 
@@ -45,11 +48,13 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    std::string filename = "../../meshes/bunny_small.obj";
     // Make sure a mesh name was given
-    if (inputFilename) {
-        filename = args::get(inputFilename);
+    if (!inputFilename) {
+        std::cout << "Error: no input mesh" << vendl;
+        std::cout << parser << vendl;
+        return 1;
     }
+    std::string filename = args::get(inputFilename);
 
     // Initialize polyscope
     polyscope::init();
@@ -59,21 +64,28 @@ int main(int argc, char** argv) {
 
     // Load mesh
     std::tie(mesh, geom) = readManifoldSurfaceMesh(filename);
-    std::cout << "Genus: " << mesh->genus() << std::endl;
 
     // Register the mesh with polyscope
     psMesh = polyscope::registerSurfaceMesh(
         polyscope::guessNiceNameFromPath(filename), geom->vertexPositions,
         mesh->getFaceVertexList(), polyscopePermutations(*mesh));
+    // psMesh->setEnabled(false);
 
-    std::vector<double> vData;
-    vData.reserve(mesh->nVertices());
-    for (size_t iV = 0; iV < mesh->nVertices(); ++iV) {
-        vData.push_back(randomReal(0, 1));
+    VertexData<Vector2> param = parameterizeBFF(*mesh, *geom);
+    for (Vertex v : mesh->vertices()) {
+        param[v].x *= -1; // need to flip orientation for some reason
     }
 
-    auto q = psMesh->addVertexScalarQuantity("data", vData);
-    q->setEnabled(true);
+    BPM bpm(*mesh, *geom, param);
+
+    polyscope::SurfaceVertexBlendedMobiusParameterizationQuantity q(
+        "param", polyscope::standardizeVectorArray<glm::vec2, 2>(param),
+        bpm.computePolyscopeCoordinates(), bpm.computePolyscopeMatrices(),
+        polyscope::ParamCoordsType::UNIT, polyscope::ParamVizStyle::GRID,
+        *psMesh);
+    psMesh->addQuantity(&q);
+    q.setEnabled(true);
+
 
     // Give control to the polyscope gui
     polyscope::show();
