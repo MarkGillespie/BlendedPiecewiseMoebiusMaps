@@ -17,7 +17,7 @@ make -j7
 
 Then run the code with
 ```
-bin/run /path/to/a/mesh
+bin/run ../data/camel-head.obj
 ```
 
 Run the tests with
