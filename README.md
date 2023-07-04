@@ -6,6 +6,13 @@ The code takes in a mesh with disk topology, flattens it with [BFF](https://geom
 |:----:|:-----:|
 |BPM interpolation|Piecewise-linear interpolation|
 
+## Cloning
+This repository uses [git submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules) to manage dependencies. To clone everything, run
+```
+git clone --recursive git@github.com:MarkGillespie/BlendedPiecewiseMoebiusMaps.git
+```
+or run `git submodule update --init --recursive` after cloning.
+
 ## Building
 To build the code, you can run
 ```
