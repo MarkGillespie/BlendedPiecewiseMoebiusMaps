@@ -7,9 +7,11 @@ The code takes in a mesh with disk topology, flattens it with [BFF](https://geom
 |BPM interpolation|Piecewise-linear interpolation|
 
 ## Building
-This repo is set up as a template, but it seems the submodules don't get copied to the new project. Run `setup.sh` to set up the required submodules and to run cmake. Setup also sets up cmake to export compile commands for `clang-format`. To build the code, you can run
+To build the code, you can run
 ```
+mkdir build
 cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j7
 ```
 
