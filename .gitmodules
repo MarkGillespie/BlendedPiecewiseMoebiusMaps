@@ -1,7 +1,7 @@
 [submodule "deps/polyscope"]
 	path = deps/polyscope
 	url = git@github.com:MarkGillespie/polyscope.git
-	branch = master
+	branch = shaderConfig
 [submodule "deps/geometry-central"]
 	path = deps/geometry-central
 	url = git@github.com:MarkGillespie/geometry-central.git
