@@ -130,9 +130,9 @@ BPM::getBlendedParamPointCloud(size_t res) {
         Eigen::Matrix2cd Mki =
             paramMap[ki.twin().face()] * transitionMap[ki.twin()];
 
-        Eigen::Matrix2cd lij = pmlog(Mij * Mijk.inverse()); // "log ratio"
-        Eigen::Matrix2cd ljk = pmlog(Mjk * Mijk.inverse()); // "log ratio"
-        Eigen::Matrix2cd lki = pmlog(Mki * Mijk.inverse()); // "log ratio"
+        Eigen::Matrix2cd lij = pmlog(Mijk.inverse() * Mij); // "log ratio"
+        Eigen::Matrix2cd ljk = pmlog(Mijk.inverse() * Mjk); // "log ratio"
+        Eigen::Matrix2cd lki = pmlog(Mijk.inverse() * Mki); // "log ratio"
 
         // no contribution from boundary faces
         if (ij.edge().isBoundary()) lij = Eigen::Matrix2cd::Zero();

@@ -131,7 +131,7 @@ const render::ShaderReplacementRule MESH_PROPAGATE_BLENDED_MOBIUS_VALUE2(
               mat2 blendedRatio_im = ec[0] * lij_im + ec[1] * ljk_im + ec[2] * lki_im;
               mat2 M_re, M_im;
               exp(blendedRatio_re / 2., blendedRatio_im / 2., M_re, M_im);
-              shadeValue2 = applyMoebius(M_re, M_im, (applyMoebius(Mijk_re, Mijk_im, f_z)));
+              shadeValue2 = applyMoebius(Mijk_re, Mijk_im, (applyMoebius(M_re, M_im, f_z)));
           } else { // linear interpolation
               shadeValue2 = f_coords;
           }
